@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Energy Efficiency Optimization</title>
+  <!-- Axios for making API requests -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 50px;
+      background-color: #f0f4f7;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      display: block;
+      width: 100%;
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: #e9ecef;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Energy Efficiency Optimization</h1>
+    <form id="optimization-form">
+      <label for="min_req">Minimum Energy Requirement:</label>
+      <input type="number" step="any" id="min_req" name="min_req" placeholder="e.g., 50" required>
+
+      <label for="cost1">Cost Coefficient for Source 1:</label>
+      <input type="number" step="any" id="cost1" name="cost1" placeholder="e.g., 1.0" required>
+
+      <label for="cost2">Cost Coefficient for Source 2:</label>
+      <input type="number" step="any" id="cost2" name="cost2" placeholder="e.g., 1.2" required>
+
+      <label for="max1">Maximum Supply from Source 1:</label>
+      <input type="number" step="any" id="max1" name="max1" placeholder="e.g., 100" required>
+
+      <label for="max2">Maximum Supply from Source 2:</label>
+      <input type="number" step="any" id="max2" name="max2" placeholder="e.g., 100" required>
+
+      <button type="submit">Optimize</button>
+    </form>
+
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    document.getElementById('optimization-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      // Gather form values.
+      const min_req = document.getElementById('min_req').value;
+      const cost1 = document.getElementById('cost1').value;
+      const cost2 = document.getElementById('cost2').value;
+      const max1 = document.getElementById('max1').value;
+      const max2 = document.getElementById('max2').value;
+
+      const payload = { min_req, cost1, cost2, max1, max2 };
+
+      // Make an API call to the backend.
+      axios.post('/optimize', payload)
+        .then(response => {
+          const data = response.data;
+          let output = '';
+          if (data.success) {
+            output = '<p><strong>Optimization Successful</strong></p>';
+            output += '<p>Source 1 Allocation: ' + data.energy_allocations.source1.toFixed(2) + '</p>';
+            output += '<p>Source 2 Allocation: ' + data.energy_allocations.source2.toFixed(2) + '</p>';
+            output += '<p>Total Cost: ' + data.total_cost.toFixed(2) + '</p>';
+          } else {
+            output = '<p><strong>Error:</strong> ' + data.message + '</p>';
+          }
+          document.getElementById('result').innerHTML = output;
+        })
+        .catch(error => {
+          document.getElementById('result').innerHTML = '<p><strong>Error:</strong> ' + error + '</p>';
+        });
+    });
+  </script>
+</body>
+</html>
